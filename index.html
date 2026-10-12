@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mão de Vaca 🐮 — Painel de Controle Financeiro</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            slate: {
+              850: '#151f32',
+              950: '#090e17'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+  <!-- Container Principal -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- CABEÇALHO / HEADER: MÃO DE VACA 🐮 -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+      <div class="flex items-center gap-3.5">
+        <!-- Logo Vaquinha SVG Estilizada -->
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/25 shrink-0 border border-emerald-400/30 group cursor-pointer hover:scale-105 transition-transform" title="Mão de Vaca 🐮">
+          <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Chifres -->
+            <path d="M16 22C13 14 18 10 20 12C22 14 20 20 18 24" fill="#F59E0B" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M48 22C51 14 46 10 44 12C42 14 44 20 46 24" fill="#F59E0B" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Orelhas -->
+            <ellipse cx="14" cy="27" rx="7" ry="4" transform="rotate(-25 14 27)" fill="#FFFFFF" stroke="#334155" stroke-width="2"/>
+            <ellipse cx="14" cy="27" rx="4" ry="2" transform="rotate(-25 14 27)" fill="#F472B6"/>
+            <ellipse cx="50" cy="27" rx="7" ry="4" transform="rotate(25 50 27)" fill="#FFFFFF" stroke="#334155" stroke-width="2"/>
+            <ellipse cx="50" cy="27" rx="4" ry="2" transform="rotate(25 50 27)" fill="#F472B6"/>
+            <!-- Cabeça da Vaquinha -->
+            <ellipse cx="32" cy="33" rx="18" ry="16" fill="#FFFFFF" stroke="#1E293B" stroke-width="2.5"/>
+            <!-- Manchas pretas da vaquinha -->
+            <path d="M22 23C24 19 31 19 30 25C29 28 20 28 22 23Z" fill="#1E293B"/>
+            <path d="M42 25C44 21 48 23 47 28C46 31 40 30 42 25Z" fill="#1E293B"/>
+            <!-- Olhinhos -->
+            <ellipse cx="25" cy="31" rx="2.5" ry="3.5" fill="#1E293B"/>
+            <ellipse cx="39" cy="31" rx="2.5" ry="3.5" fill="#1E293B"/>
+            <circle cx="26" cy="30" r="1" fill="#FFFFFF"/>
+            <circle cx="40" cy="30" r="1" fill="#FFFFFF"/>
+            <!-- Focinho rosa -->
+            <rect x="20" y="37" width="24" height="15" rx="7.5" fill="#FBCFE8" stroke="#F472B6" stroke-width="2"/>
+            <!-- Narinas -->
+            <ellipse cx="27" cy="44.5" rx="2" ry="2.5" fill="#BE185D"/>
+            <ellipse cx="37" cy="44.5" rx="2" ry="2.5" fill="#BE185D"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-400 dark:via-teal-300 dark:to-indigo-300 bg-clip-text text-transparent">
+              Mão de Vaca 🐮
+            </h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/40">
+              Economia Inteligente
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Painel financeiro pessoal onde cada centavo conta • Gestão de despesas, receitas e metas
+          </p>
+        </div>
+      </div>
+
+      <!-- Barra de Ações do Topo -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Seletor de Período -->
+        <div class="relative">
+          <select id="select-period" class="appearance-none pl-3 pr-8 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer">
+            <!-- Populado via JS -->
+          </select>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        </div>
+
+        <!-- Menu de Dados / Backup -->
+        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-1 shadow-sm">
+          <button id="btn-export-json" title="Exportar Backup JSON" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i data-lucide="download" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-export-csv" title="Exportar Planilha CSV" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-import-json" title="Restaurar Backup JSON" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i data-lucide="upload" class="w-4 h-4"></i>
+          </button>
+          <input type="file" id="input-import-file" accept=".json" class="hidden">
+          <div class="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+          <button id="btn-reset-demo" title="Carregar Dados de Demonstração" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-clear-data" title="Limpar Todos os Dados" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i data-lucide="trash" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Toggle Modo Escuro / Claro -->
+        <button id="btn-toggle-theme" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
+          <i id="theme-toggle-icon" data-lucide="moon" class="w-4 h-4"></i>
+          <span id="theme-toggle-text" class="hidden sm:inline">Modo Escuro</span>
+        </button>
+
+        <!-- Botão: Anexar Extrato Bancário -->
+        <button id="btn-open-statement-modal" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-xs sm:text-sm font-bold shadow-sm transition-all transform active:scale-95">
+          <i data-lucide="file-up" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+          <span>Anexar Extrato</span>
+        </button>
+
+        <!-- Botão Primário: Nova Transação -->
+        <button id="btn-new-transaction" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-500/25 transition-all transform active:scale-95">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Nova Transação</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI CARDS (RESUMO EM NÚMEROS) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card 1: Saldo Acumulado -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Saldo Geral Acumulado</span>
+          <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <i data-lucide="vault" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <h3 id="kpi-total-balance" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          R$ 0,00
+        </h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Total de receitas menos despesas pagas</p>
+      </div>
+
+      <!-- Card 2: Entradas do Período -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Entradas no Período</span>
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <i data-lucide="trending-up" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <h3 id="kpi-period-income" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">
+          R$ 0,00
+        </h3>
+        <div class="flex items-center gap-1.5 mt-1">
+          <button id="btn-new-income-quick" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
+            <i data-lucide="plus" class="w-3 h-3"></i> Adicionar entrada
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Despesas do Período -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Despesas no Período</span>
+          <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+            <i data-lucide="trending-down" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <h3 id="kpi-period-expense" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400">
+          R$ 0,00
+        </h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Total de saídas registradas</p>
+      </div>
+
+      <!-- Card 4: Economia / Saldo Líquido -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Economia do Período</span>
+          <div class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center">
+            <i data-lucide="piggy-bank" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <h3 id="kpi-period-savings" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          R$ 0,00
+        </h3>
+        <span id="kpi-savings-rate" class="text-xs font-semibold px-2 py-0.5 rounded-full inline-block mt-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+          0.0% economizado
+        </span>
+      </div>
+
+    </section>
+
+    <!-- SEÇÃO DE GRÁFICOS INTERATIVOS -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Gráfico 1: Comparativo Mensal (Entradas vs Despesas) - 2 Colunas -->
+      <div class="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-base">Evolução Mensal (Entradas vs Despesas)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Comparação histórica dos últimos 6 meses</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-semibold">
+            <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Entradas
+            </span>
+            <span class="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Despesas
+            </span>
+          </div>
+        </div>
+        <div class="chart-container h-72">
+          <canvas id="chart-monthly-comparison"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 2: Despesas por Categoria (Rosca) - 1 Coluna -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Gastos por Categoria</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Distribuição no período selecionado</p>
+            </div>
+            <i data-lucide="pie-chart" class="w-4 h-4 text-slate-400"></i>
+          </div>
+          <div class="chart-container h-52">
+            <canvas id="chart-categories-doughnut"></canvas>
+          </div>
+        </div>
+
+        <!-- Top 5 Categorias Lista -->
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+          <h4 class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Maiores Despesas</h4>
+          <div id="category-breakdown-list" class="space-y-1.5">
+            <!-- Populado via JS -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Gráfico 3: Fluxo de Caixa e Balanço Líquido ao Longo dos Meses -->
+    <section class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="font-bold text-slate-900 dark:text-white text-base">Tendência de Balanço Líquido</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Fluxo de economia e excedente mês a mês</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+          <i data-lucide="line-chart" class="w-4 h-4"></i> Linha de Tendência
+        </div>
+      </div>
+      <div class="chart-container h-48 sm:h-56">
+        <canvas id="chart-net-balance"></canvas>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE METAS E ORÇAMENTO (BUDGETS) -->
+    <section class="space-y-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h3 class="font-bold text-slate-900 dark:text-white text-lg">Categorias & Metas de Orçamento</h3>
+            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/40 flex items-center gap-1">
+              <i data-lucide="info" class="w-3 h-3"></i> Clique em qualquer categoria para abrir a descrição completa
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Acompanhe limites de gastos, despesas realizadas e entradas de cada categoria</p>
+        </div>
+
+        <!-- Abas de Navegação / Filtro de Categorias -->
+        <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 text-xs font-semibold shrink-0">
+          <button type="button" id="btn-cat-tab-expenses" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition-all">Despesas & Metas</button>
+          <button type="button" id="btn-cat-tab-incomes" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Receitas</button>
+          <button type="button" id="btn-cat-tab-all" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Todas</button>
+        </div>
+      </div>
+
+      <div id="budgets-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Populado dinamicamente via JS -->
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE EXTRATO / HISTÓRICO DE TRANSAÇÕES -->
+    <section class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+      
+      <!-- Barra de Filtros e Busca -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-slate-900 dark:text-white text-lg">Extrato de Transações</h3>
+            <span id="transactions-count-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              0 registros
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Pesquise, filtre e edite entradas e saídas</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Busca por texto -->
+          <div class="relative min-w-[200px]">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="search-input" placeholder="Buscar por descrição..." class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+
+          <!-- Filtro de Categoria -->
+          <select id="filter-category" class="py-2 px-3 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="all">Todas as categorias</option>
+          </select>
+
+          <!-- Toggle de Tipo: Todas / Receitas / Despesas -->
+          <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+            <button class="btn-filter-type px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-colors" data-type="all">Todas</button>
+            <button class="btn-filter-type px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors" data-type="income">Receitas</button>
+            <button class="btn-filter-type px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors" data-type="expense">Despesas</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela de Transações -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Data</th>
+              <th class="py-3 px-4">Descrição & Categoria</th>
+              <th class="py-3 px-4 hidden sm:table-cell">Pagamento</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Valor</th>
+              <th class="py-3 px-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-table-body">
+            <!-- Linhas geradas via JavaScript -->
+          </tbody>
+        </table>
+
+        <!-- Estado Vazio -->
+        <div id="transactions-empty-state" class="hidden text-center py-12">
+          <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3">
+            <i data-lucide="inbox" class="w-6 h-6"></i>
+          </div>
+          <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">Nenhuma transação encontrada</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">Tente ajustar seus filtros de busca ou adicione um novo registro clicando no botão abaixo.</p>
+        </div>
+      </div>
+
+      <!-- Paginação -->
+      <div id="pagination-container"></div>
+    </section>
+
+    <!-- RODAPÉ -->
+    <footer class="pt-6 pb-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+      <div class="flex items-center gap-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+        <span>Seus dados ficam 100% salvos no armazenamento local do seu navegador (LocalStorage).</span>
+      </div>
+      <div>
+        <span>Mão de Vaca 🐮 v1.0 • Economia Inteligente</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== MODAIS ==================== -->
+
+  <!-- MODAL: NOVA / EDITAR TRANSAÇÃO -->
+  <div id="modal-transaction" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in" onclick="event.stopPropagation()">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h3 id="modal-transaction-title" class="font-bold text-lg text-slate-900 dark:text-white">Nova Transação</h3>
+        <button id="btn-close-tx-modal" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Formulário -->
+      <form id="tx-form" class="p-5 space-y-4">
+        <input type="hidden" id="tx-type" value="expense">
+
+        <!-- Seletor de Tipo (Despesa / Receita) -->
+        <div class="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+          <button type="button" id="btn-type-expense" class="flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-rose-600 text-white shadow-sm transition-all">
+            Despesa
+          </button>
+          <button type="button" id="btn-type-income" class="flex-1 py-2 px-3 text-sm font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            Receita
+          </button>
+        </div>
+
+        <!-- Descrição -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Descrição *</label>
+          <input type="text" id="tx-description" required placeholder="Ex: Supermercado, Salário, Conta de Luz" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <!-- Valor & Categoria em 2 colunas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Valor (R$) *</label>
+            <input type="number" id="tx-amount" step="0.01" min="0.01" required placeholder="0,00" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Categoria *</label>
+            <select id="tx-category" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <!-- Populado via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Data & Método de Pagamento -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Data *</label>
+            <input type="date" id="tx-date" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Forma de Pagamento</label>
+            <select id="tx-payment" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="pix">Pix</option>
+              <option value="credito">Cartão de Crédito</option>
+              <option value="debito">Cartão de Débito</option>
+              <option value="dinheiro">Dinheiro</option>
+              <option value="transferencia">Transferência (TED)</option>
+              <option value="boleto">Boleto</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Status & Observações -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Status</label>
+            <select id="tx-status" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="completed">Concluído (Pago)</option>
+              <option value="pending">Pendente (A pagar/receber)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Observações (Opcional)</label>
+            <input type="text" id="tx-notes" placeholder="Ex: Parcela 1/3, compras do mês" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <!-- Botões do Rodapé -->
+        <div class="pt-4 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="window.finApp.closeModal('modal-transaction')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-md shadow-brand-500/20 transition-all">
+            Salvar Transação
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR LIMITE DE ORÇAMENTO -->
+  <div id="modal-budget" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in" onclick="event.stopPropagation()">
+      
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-bold text-base text-slate-900 dark:text-white">Definir Orçamento</h3>
+        <button id="btn-close-budget-modal" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="budget-form" class="p-5 space-y-4">
+        <input type="hidden" id="budget-cat-id">
+        <div>
+          <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Categoria:</label>
+          <p id="budget-cat-name" class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3"></p>
+
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Limite Mensal Desejado (R$)</label>
+          <input type="number" id="budget-amount" step="10" min="0" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-base font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <p class="text-[11px] text-slate-400 mt-1">Defina 0 para deixar sem limite.</p>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="window.finApp.closeModal('modal-budget')" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-sm">
+            Salvar Limite
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL: ANEXAR EXTRATO BANCÁRIO & MONTAR PLANILHA AUTOMATICAMENTE -->
+  <div id="modal-statement" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-5">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-fade-in" onclick="event.stopPropagation()">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-slate-900 dark:text-white">Importar Extrato Bancário</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Monte a planilha automaticamente com categorização inteligente de gastos</p>
+          </div>
+        </div>
+        <button id="btn-close-statement-modal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Corpo do Modal com Scroll -->
+      <div class="p-5 overflow-y-auto space-y-5 flex-1">
+        
+        <!-- ESTADO 1: ÁREA DE UPLOAD / DROPZONE / COLAR TEXTO -->
+        <div id="statement-upload-zone" class="space-y-4">
+          <!-- Abas de seleção de entrada -->
+          <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+            <button type="button" id="tab-btn-file" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 transition-all">
+              <i data-lucide="file-up" class="w-3.5 h-3.5 inline mr-1"></i> Anexar Arquivo (.OFX ou .CSV)
+            </button>
+            <button type="button" id="tab-btn-paste" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 inline mr-1"></i> Colar Texto do Extrato
+            </button>
+          </div>
+
+          <!-- PAINEL 1: ARRASTAR / ANEXAR ARQUIVO -->
+          <div id="panel-upload-file">
+            <div id="statement-dropzone" class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl p-8 sm:p-10 text-center transition-all cursor-pointer bg-slate-50/60 dark:bg-slate-850/50 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 shadow-sm">
+                <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 text-base sm:text-lg mb-1">
+                Arraste e solte o seu extrato bancário aqui
+              </h4>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
+                Suporta extratos do <strong>Banco Inter, Nubank, Itaú, Bradesco, Santander, BB, C6</strong> em formato <strong>.OFX</strong> ou <strong>.CSV</strong>.
+              </p>
+              <div class="flex flex-wrap items-center justify-center gap-2">
+                <button type="button" id="btn-browse-statement-file" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all">
+                  Selecionar Arquivo no Computador
+                </button>
+                <button type="button" id="btn-load-demo-statement" class="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+                  Testar com Extrato Real (Banco Inter)
+                </button>
+              </div>
+              <input type="file" id="input-statement-file" accept=".ofx,.csv,.txt" class="hidden">
+            </div>
+          </div>
+
+          <!-- PAINEL 2: COLAR TEXTO DO EXTRATO -->
+          <div id="panel-paste-text" class="hidden space-y-3">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Cole abaixo as linhas copiadas do seu extrato bancário (Ctrl+V):
+            </label>
+            <textarea id="textarea-pasted-statement" rows="8" placeholder="Data Lançamento;Histórico;Descrição;Valor;Saldo&#10;11/10/2026;Pix enviado ;99 Food Ltda;-34,85;143,75&#10;10/10/2026;Pix recebido;Silvia Ferreira Pontes;2.000,00;178,60&#10;10/10/2026;Aplicação;Cdb Pos Di Liq. Banco Inter S A;-180,00;-1.821,40..." class="w-full p-3.5 text-xs font-mono rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+            <div class="flex items-center justify-end gap-2">
+              <button type="button" id="btn-process-pasted-text" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5">
+                <i data-lucide="table" class="w-4 h-4"></i>
+                Ler e Montar Planilha Automaticamente
+              </button>
+            </div>
+          </div>
+
+          <!-- Bancos e Dicas Rápidas -->
+          <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+            <div class="flex items-center gap-2 mb-1.5">
+              <i data-lucide="info" class="w-4 h-4 text-emerald-500"></i>
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Como funciona a leitura automática:</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              O sistema ignora os cabeçalhos do banco, detecta valores negativos como <strong>Gastos/Despesas</strong> e positivos como <strong>Entradas</strong>, e analisa o nome do favorecido ou estabelecimento para atribuir categorias como <em>Comida, Transporte, Lazer, Gastos Fixos, Investimentos e Compras</em>.
+            </p>
+          </div>
+        </div>
+
+        <!-- ESTADO 2: PLANILHA GERADA E PRÉ-VISUALIZAÇÃO (OCULTO ATÉ O ARQUIVO SER PROCESSADO) -->
+        <div id="statement-preview-zone" class="hidden space-y-4">
+          
+          <!-- Mini KPIs do Extrato -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Lançamentos</span>
+              <span id="stmt-kpi-count" class="text-lg font-bold text-slate-900 dark:text-white">0</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Total Entradas</span>
+              <span id="stmt-kpi-income" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">R$ 0,00</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Total Saídas</span>
+              <span id="stmt-kpi-expense" class="text-lg font-bold text-rose-600 dark:text-rose-400">R$ 0,00</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Saldo Período</span>
+              <span id="stmt-kpi-net" class="text-lg font-bold text-slate-900 dark:text-white">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Cabeçalho da Planilha com Ações -->
+          <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Planilha Gerada do Extrato</span>
+              <span class="text-[11px] text-slate-400">• Revise as categorias sugeridas antes de importar</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-stmt-select-all" class="text-xs text-brand-600 dark:text-brand-400 hover:underline font-semibold">
+                Marcar Todos
+              </button>
+              <span class="text-slate-300 dark:text-slate-700">|</span>
+              <button type="button" id="btn-stmt-deselect-all" class="text-xs text-slate-500 hover:underline">
+                Desmarcar Todos
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabela Estilo Planilha / Grid -->
+          <div class="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden max-h-72 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 z-10">
+                <tr>
+                  <th class="py-2.5 px-3 w-8 text-center">
+                    <input type="checkbox" id="stmt-master-checkbox" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                  </th>
+                  <th class="py-2.5 px-3 whitespace-nowrap">Data</th>
+                  <th class="py-2.5 px-3">Descrição Detectada</th>
+                  <th class="py-2.5 px-3 min-w-[160px]">Categoria Sugerida</th>
+                  <th class="py-2.5 px-3 text-center">Tipo</th>
+                  <th class="py-2.5 px-3 text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="stmt-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                <!-- Populado dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <button type="button" id="btn-stmt-reset-file" class="hidden text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          ← Escolher outro arquivo
+        </button>
+
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" onclick="window.finApp.closeModal('modal-statement')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Cancelar
+          </button>
+          <button type="button" id="btn-stmt-download-csv" class="hidden px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            Baixar como Planilha CSV
+          </button>
+          <button type="button" id="btn-stmt-confirm-import" class="hidden px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span id="btn-stmt-confirm-text">Confirmar e Importar</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONTAINER DE TOAST NOTIFICATIONS -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+    <!-- Toasts gerados via JavaScript -->
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/statement-parser.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
+emerald-400 flex items-center justify-center mb-3 shadow-sm">
+                <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 text-base sm:text-lg mb-1">
+                Arraste e solte o seu extrato bancário aqui
+              </h4>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
+                Suporta extratos do <strong>Banco Inter, Nubank, Itaú, Bradesco, Santander, BB, C6</strong> em formato <strong>.OFX</strong> ou <strong>.CSV</strong>.
+              </p>
+              <div class="flex flex-wrap items-center justify-center gap-2">
+                <button type="button" id="btn-browse-statement-file" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all">
+                  Selecionar Arquivo no Computador
+                </button>
+                <button type="button" id="btn-load-demo-statement" class="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+                  Testar com Extrato Real (Banco Inter)
+                </button>
+              </div>
+              <input type="file" id="input-statement-file" accept=".ofx,.csv,.txt" class="hidden">
+            </div>
+          </div>
+
+          <!-- PAINEL 2: COLAR TEXTO DO EXTRATO -->
+          <div id="panel-paste-text" class="hidden space-y-3">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Cole abaixo as linhas copiadas do seu extrato bancário (Ctrl+V):
+            </label>
+            <textarea id="textarea-pasted-statement" rows="8" placeholder="Data Lançamento;Histórico;Descrição;Valor;Saldo&#10;11/10/2026;Pix enviado ;99 Food Ltda;-34,85;143,75&#10;10/10/2026;Pix recebido;Silvia Ferreira Pontes;2.000,00;178,60&#10;10/10/2026;Aplicação;Cdb Pos Di Liq. Banco Inter S A;-180,00;-1.821,40..." class="w-full p-3.5 text-xs font-mono rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+            <div class="flex items-center justify-end gap-2">
+              <button type="button" id="btn-process-pasted-text" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5">
+                <i data-lucide="table" class="w-4 h-4"></i>
+                Ler e Montar Planilha Automaticamente
+              </button>
+            </div>
+          </div>
+
+          <!-- Bancos e Dicas Rápidas -->
+          <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+            <div class="flex items-center gap-2 mb-1.5">
+              <i data-lucide="info" class="w-4 h-4 text-emerald-500"></i>
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Como funciona a leitura automática:</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              O sistema ignora os cabeçalhos do banco, detecta valores negativos como <strong>Gastos/Despesas</strong> e positivos como <strong>Entradas</strong>, e analisa o nome do favorecido ou estabelecimento para atribuir categorias como <em>Comida, Transporte, Lazer, Gastos Fixos, Investimentos e Compras</em>.
+            </p>
+          </div>
+        </div>
+
+        <!-- ESTADO 2: PLANILHA GERADA E PRÉ-VISUALIZAÇÃO (OCULTO ATÉ O ARQUIVO SER PROCESSADO) -->
+        <div id="statement-preview-zone" class="hidden space-y-4">
+          
+          <!-- Mini KPIs do Extrato -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Lançamentos</span>
+              <span id="stmt-kpi-count" class="text-lg font-bold text-slate-900 dark:text-white">0</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Total Entradas</span>
+              <span id="stmt-kpi-income" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">R$ 0,00</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Total Saídas</span>
+              <span id="stmt-kpi-expense" class="text-lg font-bold text-rose-600 dark:text-rose-400">R$ 0,00</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase">Saldo Período</span>
+              <span id="stmt-kpi-net" class="text-lg font-bold text-slate-900 dark:text-white">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Cabeçalho da Planilha com Ações -->
+          <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Planilha Gerada do Extrato</span>
+              <span class="text-[11px] text-slate-400">• Revise as categorias sugeridas antes de importar</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-stmt-select-all" class="text-xs text-brand-600 dark:text-brand-400 hover:underline font-semibold">
+                Marcar Todos
+              </button>
+              <span class="text-slate-300 dark:text-slate-700">|</span>
+              <button type="button" id="btn-stmt-deselect-all" class="text-xs text-slate-500 hover:underline">
+                Desmarcar Todos
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabela Estilo Planilha / Grid -->
+          <div class="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden max-h-72 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 z-10">
+                <tr>
+                  <th class="py-2.5 px-3 w-8 text-center">
+                    <input type="checkbox" id="stmt-master-checkbox" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                  </th>
+                  <th class="py-2.5 px-3 whitespace-nowrap">Data</th>
+                  <th class="py-2.5 px-3">Descrição Detectada</th>
+                  <th class="py-2.5 px-3 min-w-[160px]">Categoria Sugerida</th>
+                  <th class="py-2.5 px-3 text-center">Tipo</th>
+                  <th class="py-2.5 px-3 text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="stmt-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                <!-- Populado dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <button type="button" id="btn-stmt-reset-file" class="hidden text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          ← Escolher outro arquivo
+        </button>
+
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" onclick="window.finApp.closeModal('modal-statement')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Cancelar
+          </button>
+          <button type="button" id="btn-stmt-download-csv" class="hidden px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            Baixar como Planilha CSV
+          </button>
+          <button type="button" id="btn-stmt-confirm-import" class="hidden px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span id="btn-stmt-confirm-text">Confirmar e Importar</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONTAINER DE TOAST NOTIFICATIONS -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+    <!-- Toasts gerados via JavaScript -->
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/statement-parser.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
