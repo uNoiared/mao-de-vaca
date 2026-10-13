@@ -1,41 +1,52 @@
 /**
  * Parser de Extratos Bancários (OFX, CSV e Texto Copiado)
- * Especializado nos formatos brasileiros (Banco Inter, Nubank, Itaú, Bradesco, Santander, etc.)
+ * Especializado nos formatos brasileiros (Banco do Brasil, Itaú, Nubank, Banco Inter, Bradesco, Santander, Caixa, C6, etc.)
  * Classifica com precisão:
  * - Tipo de transação (Entrada/Recebimento vs Saída/Gasto)
  * - Categoria (Comida, Lazer, Gastos Fixos, Transporte, Investimentos, Compras, etc.)
- * - Forma de pagamento
+ * - Forma de pagamento (Pix, Débito, Crédito, Boleto, Transferência, Dinheiro)
  */
 
 class StatementParser {
   constructor() {
     this.expenseKeywords = [
       'enviad', 'envio pix', 'pix enviado', 'compra', 'debito', 'débito', 'deb.',
-      'pagamento', 'pagto', 'pgto', 'pago', 'fatura', 'boleto', 'titulo',
+      'pagamento', 'pagto', 'pgto', 'pago', 'fatura', 'boleto', 'titulo', 'título',
       'saque', 'tarifa', 'taxa', 'anuidade', 'iof', 'juros', 'multa', 'recarga',
-      'aplicacao', 'aplicação', 'aporte', 'ted enviada', 'doc enviado', 'deb aut', 'debito online td'
+      'aplicacao', 'aplicação', 'aporte', 'ted enviada', 'doc enviado', 'deb aut',
+      'debito online', 'débito online', 'seguro', 'da ', 'deb.aut'
     ];
 
     this.incomeKeywords = [
       'recebid', 'recebimento', 'pix recebido', 'transferencia recebida', 'transf recebida',
-      'ted recebida', 'doc recebido', 'salario', 'salário', 'proventos', 'folha de pagamento',
-      'folha pagto', 'holerite', 'remuneracao', 'pro-labore', 'deposito', 'depósito',
-      'rendimento', 'dividendo', 'juros sobre capital', 'jcp', 'cdi', 'resgate',
-      'estorno', 'reembolso', 'devolucao', 'devolução', 'venda', 'comissao', 'comissão', 'cashback'
+      'transf. recebida', 'ted recebida', 'doc recebido', 'salario', 'salário', 'proventos',
+      'vencimentos', 'folha de pagamento', 'folha pagto', 'holerite', 'remuneracao', 'remuneração',
+      'pro-labore', 'deposito', 'depósito', 'rendimento', 'dividendo', 'dividendos',
+      'juros sobre capital', 'jcp', 'cdi', 'resgate', 'estorno', 'reembolso', 'devolucao',
+      'devolução', 'venda', 'comissao', 'comissão', 'cashback', 'ted-crédito', 'ted credito',
+      'ted-credito', 'crédito em conta', 'credito em conta', 'dep online', 'depósito online',
+      'deposito online', 'depósito em dinheiro', 'deposito dinheiro'
+    ];
+
+    // Linhas que representam saldos ou resumos contábeis (não são transações reais)
+    this.balanceKeywords = [
+      'saldo anterior', 'saldo inicial', 'saldo final', 'saldo atual', 'saldo do dia',
+      'saldo em', 'saldo bloqueado', 'saldo credor', 'saldo devedor', 'saldo disponivel',
+      'saldo disponível', 's a l d o', 'saldo provisionado', 'total de entradas',
+      'total de saídas', 'total geral', 'totais', 'limite cheque especial', 'cheque especial',
+      'saldo em c/c', 'saldo c/c', 'saldo da conta', 'saldo projetado'
     ];
 
     this.categoryRules = {
       // 1. COMIDA & ALIMENTAÇÃO
       alimentacao: [
-        'food', 'ifood', '99 food', 'restaurante', 'mcdonald', 'mc donals', 'burger', 'bk ',
+        'food', 'ifood', '99 food', '99food', 'restaurante', 'mcdonald', 'mc donals', 'burger', 'bk ',
         'padaria', 'panificadora', 'supermercado', 'mercado', 'carrefour', 'pao de acucar',
         'assai', 'atacadao', 'atacadista', 'tatico', 'hortifruti', 'sacolao', 'acougue',
-        'bar', 'choperia', 'lanchonete', 'lancheteria', 'subway', 'pizza', 'pizzaria',
-        'habib', 'ze delivery', 'cafeteria', 'starbucks', 'cafe', 'adega', 'emporio',
-        'dupao', 'pao de queijo', 'divino fogao', 'dog do jorginho', 'hot dog', 'iceberghotdog',
-        'varand', 'refeicao', 'arroz, feijao', 'pe efe', 'olimpo', 'distribuidorade',
-        'imperador alvim', 'master pao', 'dona arniquerias', 'arniqueiras', 'apetite',
-        'kiranaamir', 'ikaroferreirada', 'rodrigo sousa borges', 'rappi', 'aiqfome'
+        'bar', 'choperia', 'lanchonete', 'subway', 'pizza', 'pizzaria', 'habib', 'ze delivery',
+        'cafeteria', 'starbucks', 'cafe', 'adega', 'emporio', 'dupao', 'pao de queijo',
+        'divino fogao', 'dog do jorginho', 'hot dog', 'iceberghotdog', 'refeicao', 'arroz, feijao',
+        'pe efe', 'distribuidorade', 'rappi', 'aiqfome'
       ],
 
       // 2. TRANSPORTE & COMBUSTÍVEL
@@ -50,14 +61,15 @@ class StatementParser {
       moradia: [
         'fatura', 'pagamento fatura', 'aluguel', 'condominio', 'condomínio', 'imobiliaria',
         'enel', 'cemig', 'cpfl', 'sabesp', 'sanepar', 'copasa', 'comgas', 'energia', 'luz',
-        'agua', 'água', 'iptu', 'claro', 'vivo', 'tim', 'oi fibra', 'internet', 'net servicos'
+        'agua', 'água', 'iptu', 'claro', 'vivo', 'tim', 'oi fibra', 'da oi', 'oi-mg', 'oi ',
+        'internet', 'net servicos', 'seguro', 'seguro residencial', 'pag boleto internet'
       ],
 
       // 4. INVESTIMENTOS & APLICAÇÕES / RESERVA
       investimentos: [
         'cdb', 'pos di', 'banco inter', 'aplicação', 'aplicacao', 'resgate', 'tesouro',
         'renda+', 'aposentadoria', 'debito online td', 'fii', 'ações', 'rendimento', 'dividendo',
-        'xp investimentos', 'nu invest', 'btg'
+        'dividendos', 'xp investimentos', 'nu invest', 'btg', 'bb giro', 'ourocard'
       ],
 
       // 5. LAZER & ENTRETENIMENTO
@@ -71,21 +83,20 @@ class StatementParser {
       compras: [
         'amazon', 'shpp', 'shopee', 'mercado livre', 'mercadolivre', 'aliexpress', 'shein',
         'magalu', 'magazine luiza', 'americanas', 'casas bahia', 'zara', 'renner', 'c&a',
-        'riachuelo', 'marketplace vendas', 'startimpressoese', 'smilein', 'maree', 'jim.com',
-        'centauro', 'decathlon', 'nike', 'bcs - brasilia'
+        'riachuelo', 'marketplace', 'centauro', 'decathlon', 'nike'
       ],
 
       // 7. SAÚDE & FARMÁCIA
       saude: [
         'farmacia', 'farmácia', 'droga raia', 'drogasil', 'pague menos', 'panvel',
-        'ultrafarma', 'remedio', 'medicamento', 'hospital', 'consulta', 'medico',
-        'dentista', 'odontologia', 'laboratorio', 'fleury', 'clinica', 'otica'
+        'ultrafarma', 'drogaria', 'remedio', 'medicamento', 'hospital', 'consulta', 'medico',
+        'dentista', 'odontologia', 'laboratorio', 'fleury', 'clinica', 'otica', 'unimed'
       ],
 
       // 8. ASSINATURAS & STREAMING
       assinaturas: [
-        'netflix', 'spotify', 'amazon prime', 'prime video', 'disney', 'hbo max',
-        'youtube', 'deezer', 'openai', 'chatgpt', 'adobe', 'apple.com', 'google play'
+        'netflix', 'spotify', 'amazon prime', 'prime video', 'disney', 'hbo max', 'max ',
+        'youtube', 'deezer', 'openai', 'chatgpt', 'adobe', 'apple.com', 'google play', 'canva'
       ],
 
       // 9. EDUCAÇÃO
@@ -95,16 +106,19 @@ class StatementParser {
 
       // RECEITAS / ENTRADAS ESPECÍFICAS
       salario: [
-        'salario', 'salário', 'proventos', 'folha de pagamento', 'holerite', 'pro-labore'
+        'salario', 'salário', 'proventos', 'vencimentos', 'folha de pagamento', 'folha pagto',
+        'holerite', 'pro-labore', 'crédito de salário', 'credito salario'
       ],
       freelance: [
-        'paypal', 'freelance', 'projeto', 'consultoria', 'honorarios', 'remittance', 'rendimento - pix remittance'
+        'paypal', 'freelance', 'projeto', 'consultoria', 'honorarios', 'remittance'
       ],
       cashback: [
-        'cashback', 'reembolso', 'estorno'
+        'cashback', 'reembolso', 'estorno', 'devolução', 'devolucao'
       ],
       transferencias_recebidas: [
-        'pix recebido', 'transferencia recebida', 'transf recebida', 'ted recebida', 'doc recebido'
+        'pix', 'transf', 'transferencia', 'transferência', 'ted', 'doc',
+        'deposito', 'depósito', 'dep online', 'depósito online', 'crédito em conta',
+        'credito em conta', 'recebimento'
       ],
       transferencias_pix: [
         'pix enviado', 'transferencia enviada'
@@ -122,13 +136,34 @@ class StatementParser {
     return text.includes(term);
   }
 
+  isBalanceRow(text) {
+    if (!text) return false;
+    const lower = text.toLowerCase().trim();
+    if (lower === 'saldo' || lower.startsWith('saldo:') || lower.startsWith('saldo ')) return true;
+    return this.balanceKeywords.some(b => lower.includes(b));
+  }
+
   parseAmountData(valStr) {
-    if (valStr === undefined || valStr === null) return { amount: NaN, isExplicitNegative: false, isExplicitPositive: false };
+    if (valStr === undefined || valStr === null) {
+      return { amount: NaN, isExplicitNegative: false, isExplicitPositive: false, isCreditIndicator: false, isDebitIndicator: false };
+    }
     let raw = valStr.toString().trim();
-    if (!raw) return { amount: NaN, isExplicitNegative: false, isExplicitPositive: false };
+    if (!raw) return { amount: NaN, isExplicitNegative: false, isExplicitPositive: false, isCreditIndicator: false, isDebitIndicator: false };
 
     let isExplicitNegative = false;
     let isExplicitPositive = false;
+    let isCreditIndicator = false;
+    let isDebitIndicator = false;
+
+    // Detecta padrão de bancos brasileiros com letra C ou D no valor (ex: '1.000,00 C', '252,65 D', '150,00(C)')
+    const upperRaw = raw.toUpperCase();
+    if (/\bC\b|[\d\s]C$|\(C\)|CRÉDITO|CREDITO|\bCR\b/.test(upperRaw)) {
+      isExplicitPositive = true;
+      isCreditIndicator = true;
+    } else if (/\bD\b|[\d\s]D$|\(D\)|DÉBITO|DEBITO|\bDB\b/.test(upperRaw)) {
+      isExplicitNegative = true;
+      isDebitIndicator = true;
+    }
 
     if (raw.includes('(') && raw.includes(')')) {
       isExplicitNegative = true;
@@ -142,7 +177,7 @@ class StatementParser {
       isExplicitNegative = true;
       raw = raw.replace('-', '').trim();
     }
-    if (raw.startsWith('+')) {
+    if (raw.startsWith('+') || raw.endsWith('+')) {
       isExplicitPositive = true;
       raw = raw.replace('+', '').trim();
     }
@@ -158,7 +193,9 @@ class StatementParser {
     return {
       amount: isNaN(num) ? NaN : num,
       isExplicitNegative,
-      isExplicitPositive
+      isExplicitPositive,
+      isCreditIndicator,
+      isDebitIndicator
     };
   }
 
@@ -195,13 +232,13 @@ class StatementParser {
   // --- PARSE DE ARQUIVOS CSV OU TEXTO COPIADO ---
   parseCSV(content) {
     const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-    if (lines.length < 2) return [];
+    if (lines.length < 1) return [];
 
-    // 1. LOCALIZAR A LINHA DE CABEÇALHO DA TABELA
+    // 1. LOCALIZAR A LINHA DE CABEÇALHO DA TABELA E O DELIMITADOR
     let headerLineIndex = -1;
     let delimiter = ';';
 
-    for (let i = 0; i < lines.length; i++) {
+    for (let i = 0; i < Math.min(lines.length, 15); i++) {
       const line = lines[i];
       const countSemi = (line.match(/;/g) || []).length;
       const countComma = (line.match(/,/g) || []).length;
@@ -212,8 +249,8 @@ class StatementParser {
       else if (countTab > countSemi && countTab > countComma) lineDelim = '\t';
 
       const parts = this.parseCSVLine(line, lineDelim).map(p => p.toLowerCase().trim());
-      const hasDate = parts.some(p => p.includes('data') || p === 'dt' || p === 'date' || p.includes('dia'));
-      const hasKey = parts.some(p => p.includes('valor') || p.includes('historico') || p.includes('histórico') || p.includes('descri') || p.includes('amount') || p.includes('saldo') || p.includes('debito') || p.includes('credito'));
+      const hasDate = parts.some(p => p.includes('data') || p === 'dt' || p === 'date' || p.includes('dia') || p.includes('movim'));
+      const hasKey = parts.some(p => p.includes('valor') || p.includes('historico') || p.includes('histórico') || p.includes('descri') || p.includes('lancamento') || p.includes('lançamento') || p.includes('amount') || p.includes('saldo') || p.includes('debito') || p.includes('credito'));
 
       if (hasDate && hasKey && parts.length >= 2) {
         headerLineIndex = i;
@@ -233,12 +270,12 @@ class StatementParser {
 
     if (headerLineIndex !== -1) {
       const headers = this.parseCSVLine(lines[headerLineIndex], delimiter).map(h => h.toLowerCase().trim());
-      dateIdx = headers.findIndex(h => h.includes('data') || h.includes('date') || h.includes('dia'));
-      histIdx = headers.findIndex(h => h.includes('historico') || h.includes('histórico'));
-      descIdx = headers.findIndex(h => h.includes('descri') || h.includes('memo') || h.includes('detalhe') || h.favorecido || h.includes('identificador'));
-      debitIdx = headers.findIndex(h => h.includes('saida') || h.includes('saída') || h.includes('debito') || h.includes('débito') || h.includes('despesa'));
-      creditIdx = headers.findIndex(h => h.includes('entrada') || h.includes('credito') || h.includes('crédito') || h.includes('receita'));
-      amountIdx = headers.findIndex(h => (h.includes('valor') || h.includes('quantia') || h.includes('amount')) && !h.includes('saldo'));
+      dateIdx = headers.findIndex(h => h.includes('data') || h.includes('date') || h.includes('dia') || h.includes('movim'));
+      histIdx = headers.findIndex((h, idx) => idx !== dateIdx && (h.includes('historico') || h.includes('histórico') || h.includes('lançamento') || h.includes('lancamento') || h.includes('movimentação') || h.includes('movimentacao')));
+      descIdx = headers.findIndex((h, idx) => idx !== dateIdx && idx !== histIdx && (h.includes('descri') || h.includes('memo') || h.includes('detalhe') || h.includes('favorecido') || h.includes('identificador')));
+      debitIdx = headers.findIndex(h => (h.includes('saida') || h.includes('saída') || h.includes('debito') || h.includes('débito') || h.includes('despesa')) && !h.includes('saldo'));
+      creditIdx = headers.findIndex(h => (h.includes('entrada') || h.includes('credito') || h.includes('crédito') || h.includes('receita')) && !h.includes('saldo'));
+      amountIdx = headers.findIndex(h => (h.includes('valor') || h.includes('quantia') || h.includes('amount') || h.includes('montante') || h === 'vlr') && !h.includes('saldo'));
       typeIdx = headers.findIndex(h => h === 'tipo' || h === 'type' || h.includes('d/c') || h.includes('dc') || h.includes('natureza'));
 
       startIndex = headerLineIndex + 1;
@@ -259,6 +296,22 @@ class StatementParser {
     if (descIdx === -1 && histIdx !== -1) descIdx = histIdx;
     if (descIdx === -1) descIdx = 1;
 
+    // 2. DETECÇÃO GLOBAL DO PADRÃO DE SINAL DO ARQUIVO:
+    // O arquivo possui valores negativos explícitos (ex: '-115,31') ou indicadores C/D?
+    let fileHasExplicitNegatives = false;
+    let fileHasCDIndicators = false;
+
+    for (let i = startIndex; i < lines.length; i++) {
+      const cols = this.parseCSVLine(lines[i], delimiter);
+      if (cols.length < 2) continue;
+      for (const col of cols) {
+        const ad = this.parseAmountData(col);
+        if (ad.isExplicitNegative) fileHasExplicitNegatives = true;
+        if (ad.isCreditIndicator || ad.isDebitIndicator) fileHasCDIndicators = true;
+      }
+    }
+
+    const fileUsesSignedLogic = fileHasExplicitNegatives || fileHasCDIndicators;
     const transactions = [];
 
     for (let i = startIndex; i < lines.length; i++) {
@@ -272,6 +325,11 @@ class StatementParser {
 
       const rawHist = histIdx !== -1 ? (cols[histIdx] || '').trim() : '';
       const rawDesc = descIdx !== -1 ? (cols[descIdx] || '').trim() : '';
+
+      // Ignora linhas de saldo, totais ou resumos contábeis
+      if (this.isBalanceRow(rawHist) || this.isBalanceRow(rawDesc)) {
+        continue;
+      }
 
       let displayDesc = rawDesc || rawHist || 'Transação Bancária';
       if (rawHist && rawDesc && rawHist.toLowerCase() !== rawDesc.toLowerCase()) {
@@ -306,18 +364,33 @@ class StatementParser {
 
         const explicitType = typeIdx !== -1 ? (cols[typeIdx] || '').toLowerCase() : '';
 
+        // 1ª Prioridade: Coluna de Tipo / D/C explícita
         if (explicitType.includes('c') || explicitType.includes('cred') || explicitType.includes('receita') || explicitType.includes('entrada')) {
           type = 'income';
         } else if (explicitType.includes('d') || explicitType.includes('deb') || explicitType.includes('despesa') || explicitType.includes('saida')) {
           type = 'expense';
-        } else if (amtData.isExplicitNegative) {
-          type = 'expense';
-        } else if (amtData.isExplicitPositive) {
+        }
+        // 2ª Prioridade: Indicador de Crédito (C) ou Débito (D) no próprio valor (Padrão Banco do Brasil)
+        else if (amtData.isCreditIndicator) {
           type = 'income';
-        } else if (this.incomeKeywords.some(t => this.matchTerm(fullAnalysisText, t))) {
-          type = 'income';
-        } else if (this.expenseKeywords.some(t => this.matchTerm(fullAnalysisText, t))) {
+        } else if (amtData.isDebitIndicator) {
           type = 'expense';
+        }
+        // 3ª Prioridade: Sinal negativo explícito (-)
+        else if (amtData.isExplicitNegative) {
+          type = 'expense';
+        }
+        // 4ª Prioridade: Se o arquivo usa valores com sinal (ex: Itaú onde despesas são negativas e entradas são positivas):
+        else if (fileUsesSignedLogic) {
+          if (this.expenseKeywords.some(t => this.matchTerm(fullAnalysisText, t))) {
+            type = 'expense';
+          } else {
+            type = 'income';
+          }
+        }
+        // 5ª Prioridade: Arquivo sem sinais negativos em lugar nenhum (ex: fatura avulsa):
+        else if (this.incomeKeywords.some(t => this.matchTerm(fullAnalysisText, t))) {
+          type = 'income';
         } else {
           type = 'expense';
         }
@@ -327,10 +400,11 @@ class StatementParser {
 
       let paymentMethod = 'pix';
       if (fullAnalysisText.includes('pix')) paymentMethod = 'pix';
-      else if (fullAnalysisText.includes('debito') || fullAnalysisText.includes('débito')) paymentMethod = 'debito';
-      else if (fullAnalysisText.includes('credito') || fullAnalysisText.includes('crédito') || fullAnalysisText.includes('fatura')) paymentMethod = 'credito';
-      else if (fullAnalysisText.includes('boleto')) paymentMethod = 'boleto';
-      else if (fullAnalysisText.includes('ted') || fullAnalysisText.includes('doc') || fullAnalysisText.includes('transf')) paymentMethod = 'transferencia';
+      else if (fullAnalysisText.includes('debito') || fullAnalysisText.includes('débito') || fullAnalysisText.includes('da ') || fullAnalysisText.includes('deb aut')) paymentMethod = 'debito';
+      else if (fullAnalysisText.includes('credito') || fullAnalysisText.includes('crédito') || fullAnalysisText.includes('fatura') || fullAnalysisText.includes('cartao') || fullAnalysisText.includes('cartão')) paymentMethod = 'credito';
+      else if (fullAnalysisText.includes('boleto') || fullAnalysisText.includes('titulo') || fullAnalysisText.includes('título')) paymentMethod = 'boleto';
+      else if (fullAnalysisText.includes('ted') || fullAnalysisText.includes('doc') || fullAnalysisText.includes('transf') || fullAnalysisText.includes('transferencia')) paymentMethod = 'transferencia';
+      else if (fullAnalysisText.includes('dinheiro') || fullAnalysisText.includes('saque') || fullAnalysisText.includes('especie')) paymentMethod = 'dinheiro';
 
       transactions.push({
         id: `stmt_csv_${i}_${Date.now()}`,
@@ -369,14 +443,17 @@ class StatementParser {
       let type = 'expense';
       const numRaw = parseFloat(trnAmtRaw.replace(',', '.'));
 
+      // Padrão OFX Internacional e Brasileiro:
+      // Valores > 0 são Créditos / Entradas, Valores < 0 são Débitos / Saídas
       if (trnType === 'CREDIT' || trnType === 'DEP' || trnType === 'INT' || trnType === 'DIV') {
         type = 'income';
       } else if (trnType === 'DEBIT' || trnType === 'PAYMENT' || trnType === 'CHECK' || trnType === 'FEE' || trnType === 'SRVCHG') {
         type = 'expense';
       } else if (!isNaN(numRaw)) {
-        if (numRaw < 0) type = 'expense';
-        else if (numRaw > 0) {
-          type = this.incomeKeywords.some(t => this.matchTerm(memo.toLowerCase(), t)) ? 'income' : 'expense';
+        if (numRaw > 0) {
+          type = 'income';
+        } else if (numRaw < 0) {
+          type = 'expense';
         }
       }
 
@@ -408,12 +485,14 @@ class StatementParser {
   }
 
   autoCategorize(text, type) {
+    const cleanText = (text || '').replace(/[-_/]/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+
     if (type === 'income') {
-      if (this.categoryRules.salario.some(t => this.matchTerm(text, t))) return 'salario';
-      if (this.categoryRules.freelance.some(t => this.matchTerm(text, t))) return 'freelance';
-      if (this.categoryRules.investimentos.some(t => this.matchTerm(text, t))) return 'investimentos';
-      if (this.categoryRules.cashback.some(t => this.matchTerm(text, t))) return 'cashback';
-      if (this.categoryRules.transferencias_recebidas.some(t => this.matchTerm(text, t))) return 'transferencias_recebidas';
+      if (this.categoryRules.salario.some(t => this.matchTerm(cleanText, t))) return 'salario';
+      if (this.categoryRules.freelance.some(t => this.matchTerm(cleanText, t))) return 'freelance';
+      if (this.categoryRules.investimentos.some(t => this.matchTerm(cleanText, t))) return 'investimentos';
+      if (this.categoryRules.cashback.some(t => this.matchTerm(cleanText, t))) return 'cashback';
+      if (this.categoryRules.transferencias_recebidas.some(t => this.matchTerm(cleanText, t))) return 'transferencias_recebidas';
       return 'outras_receitas';
     }
 
@@ -432,7 +511,7 @@ class StatementParser {
     ];
 
     for (const catId of order) {
-      if (this.categoryRules[catId].some(t => this.matchTerm(text, t))) {
+      if (this.categoryRules[catId].some(t => this.matchTerm(cleanText, t))) {
         return catId;
       }
     }
